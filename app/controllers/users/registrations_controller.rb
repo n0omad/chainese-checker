@@ -60,4 +60,17 @@ class Users::RegistrationsController < Devise::RegistrationsController
   # def after_inactive_sign_up_path_for(resource)
   #   super(resource)
   # end
+  private
+  def respond_with(resource, _opts = {})
+    if resource.persisted?
+      render json: {
+        status: {code: 200, message: "Signed up successfully"},
+        data: UserSerializer.new(resource).serializable_hash[:data][:attributes]
+      }
+    else
+      render json: {
+        status: {code: 422, message: "Could'nt sign up #{resource.errors.full_messages.to_sentence}"}
+      }
+    end
+  end
 end
